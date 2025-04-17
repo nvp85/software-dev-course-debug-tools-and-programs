@@ -25,6 +25,9 @@ function applyDiscount(total, discountRate) {
 }
 
 function generateReceipt(cartItems, total) {
+  if (cartItems.length == 0 && total === 0) {
+    return "The cart is empty."
+  }
   let receipt = "Items:\n";
   cartItems.forEach(item => {
       receipt += `${item.name}: $${item.price}\n`;
