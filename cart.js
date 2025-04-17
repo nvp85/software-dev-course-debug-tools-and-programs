@@ -6,13 +6,21 @@ const cart = [
 
 function calculateTotal(cartItems) {
   let total = 0;
-  for (let i = 0; i <= cartItems.length; i++) { // Bug: <= should be <
+  for (let i = 0; i < cartItems.length; i++) { // Bug: <= should be <
       total += cartItems[i].price; // Bug: cartItems[i] is undefined on the last iteration
   }
   return total;
 }
 
 function applyDiscount(total, discountRate) {
+  if (
+    typeof discountRate != "number" || 
+    isNaN(discountRate) || 
+    discountRate > 1 || 
+    discountRate < 0
+  ) {
+    throw new Error("The discount rate is invalid.");
+  }
   return total - total * discountRate; // Bug: Missing validation for discountRate
 }
 
@@ -21,15 +29,28 @@ function generateReceipt(cartItems, total) {
   cartItems.forEach(item => {
       receipt += `${item.name}: $${item.price}\n`;
   });
+  if (
+    typeof total != "number" || 
+    isNaN(total) || 
+    total < 0
+  ) {
+    throw new Error("The total price is invalid.");
+  }
   receipt += `Total: $${total.toFixed(2)}`; // Bug: total may not be a number
   return receipt;
 }
 
 // Debugging entry point
-console.log("Starting shopping cart calculation...");
-const total = calculateTotal(cart);
-const discountedTotal = applyDiscount(total, 0.2); // 20% discount
-const receipt = generateReceipt(cart, discountedTotal);
+try{
+  console.log("Starting shopping cart calculation...");
+  const total = calculateTotal(cart);
+  const discountedTotal = applyDiscount(total, 0.2); // 20% discount
+  const receipt = generateReceipt(cart, discountedTotal);
+  document.getElementById("total").textContent = `Total: $${discountedTotal}`;
+  document.getElementById("receipt").textContent = receipt;
+} catch(err) {
+  console.error(err.message);
+  document.getElementById("error-message").textContent = "Oops! Something went wrong. " + err.message;
+}
 
-document.getElementById("total").textContent = `Total: $${discountedTotal}`;
-document.getElementById("receipt").textContent = receipt;
+
